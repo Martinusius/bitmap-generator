@@ -112,20 +112,22 @@ function createBitmap(gatewayRange) {
         var data, width, height, canvas, context, imageData, buffer, i, bitmap;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, axios_1.default.get('https://www.thethingsnetwork.org/gateway-data/')];
+                case 0:
+                    console.log('uwu');
+                    return [4 /*yield*/, axios_1.default.get('https://martinusius.sk/geo.json')];
                 case 1:
-                    data = (_a.sent()).data;
+                    data = (_a.sent()).data.features;
                     width = 360, height = 180;
                     canvas = createCanvas(width, height);
                     context = canvas.getContext('2d');
                     context.fillStyle = '#ffffff';
-                    Object.values(data).forEach(function (gateway) {
-                        if (!gateway.location)
-                            return;
+                    data.forEach(function (gateway) {
+                        var longitude = gateway.geometry.coordinates[0];
+                        var latitude = gateway.geometry.coordinates[1];
                         context.beginPath();
-                        context.arc(Math.floor(gateway.location.longitude + 180) / 360 * width, // x
-                        height - Math.floor(gateway.location.latitude + 90) / 180 * height, // y
-                        gatewayRange * 1000 / 111000 / Math.cos(gateway.location.latitude * Math.PI / 180), // radius
+                        context.arc(Math.floor(longitude + 180) / 360 * width, // x
+                        height - Math.floor(latitude + 90) / 180 * height, // y
+                        gatewayRange / 111 / Math.cos(latitude * Math.PI / 180), // radius
                         0, 2 * Math.PI // full circle
                         );
                         context.fill();

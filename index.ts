@@ -67,17 +67,15 @@ app.listen(port, () => {
 // --------------------------
 
 interface Gateway {
-    location: {
-        latitude: number,
-        longitude: number,
+    geometry: {
+        coordinates: number[]
     }
 }
 
-type GatewayData = Record<string, Gateway>;
 
 async function createBitmap(gatewayRange: number) {
     // Gateway data
-    const data: GatewayData = (await axios.get('https://www.thethingsnetwork.org/gateway-data/')).data;
+    const data: Gateway[] = (await axios.get('https://martinusius.sk/geo.json')).data.features;
 
     // Draw circles onto canvas
     const width = 360, height = 180;
@@ -85,14 +83,15 @@ async function createBitmap(gatewayRange: number) {
     const context = canvas.getContext('2d');
 
     context.fillStyle = '#ffffff';
-    Object.values(data).forEach(gateway => {
-        if(!gateway.location) return;
+    data.forEach(gateway => {
+        const longitude = gateway.geometry.coordinates[0];
+        const latitude = gateway.geometry.coordinates[1];
 
         context.beginPath();
         context.arc(
-            Math.floor(gateway.location.longitude + 180) / 360 * width, // x
-            height - Math.floor(gateway.location.latitude + 90) / 180 * height, // y
-            gatewayRange / 111 / Math.cos(gateway.location.latitude * Math.PI / 180), // radius
+            Math.floor(longitude + 180) / 360 * width, // x
+            height - Math.floor(latitude + 90) / 180 * height, // y
+            gatewayRange / 111 / Math.cos(latitude * Math.PI / 180), // radius
             0, 2 * Math.PI // full circle
         );
         context.fill();
